@@ -2,15 +2,21 @@
 Featuring:
 * LT Codes
 * Random subset
-* ...and others
+* Sophisticated carousel
 
 Fountain codes take a message of <i>k</i> symbols and can generate a virtually unlimited number of encoding symbols. Any subset of <i>n</i> encoding symbols suffices for decoding the message. Better fountain codes allow for smaller <i>n</i>'s
 
 ## LT Codes
 The LT Code implementation is based on Michael Luby's <u>LT Codes</u> paper (http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1181950&isnumber=26517). Basically the number of chunks that get combined together into each encoding symbol comes from the Robust Soliton Distribution.
 ### <i>n</i> vs <i>k</i>
-![n vs k colored by p](https://raw.githubusercontent.com/matthew-a-thomas/cs-fountain-codes/master/n%20vs%20k%20(colored%20by%20p%3B%20with%20jitter).png "n vs k colored by p")
+![n vs k colored by p](https://github.com/matthew-a-thomas/cs-fountain-codes/raw/master/lt%20code%20-%20n%20vs%20k%20(colored%20by%20p%3B%20with%20jitter).png "n vs k colored by p")
 Note the color indicates <i>p</i>, the probability of packet erasure
+
+## Random subset
+The random subset fountain code picks uniformly randomly from the message. Each part of the message has equal probability of being included in the combination to make an encoding symbol. Encoding symbols will always include at least one part, though.
+### <i>n</i> vs <i>k</i>
+![n vs k colored by p](https://github.com/matthew-a-thomas/cs-fountain-codes/raw/master/random%20subset%20-%20n%20vs%20k%20(colored%20by%20p%3B%20with%20jitter).png "n vs k colored by p")
+Note the color indicates </i>p</i>, the probability of packet erasure
 
 ## Notices
 * JavaReedSolomon was obtained from (https://github.com/Backblaze/JavaReedSolomon). They use the MIT license (https://github.com/Backblaze/JavaReedSolomon/blob/master/LICENSE)
