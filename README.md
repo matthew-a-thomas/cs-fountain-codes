@@ -29,7 +29,7 @@ Note the color indicates <i>p</i>, the probability of packet erasure
 ### Plain old carousel
 The regular carousel probably isn't properly a fountain code. It just cycles through individual parts of the message, sending them one at a time solo. If the receiver misses a symbol it has to wait for the sender to cycle all the way back through the <i>k</i> message symbols.
 #### <i>n</i> vs <i>k</i>
-![n vs k colored by p](https://github.com/matthew-a-thomas/cs-fountain-codes/raw/master/carousel%20-%20n%20vs%20k%20(colored%20by%20p%3B%20with%20jitter).png).png "n vs k colored by p")
+![n vs k colored by p](https://github.com/matthew-a-thomas/cs-fountain-codes/raw/master/carousel%20-%20n%20vs%20k%20(colored%20by%20p%3B%20with%20jitter).png "n vs k colored by p")
 Note the color indicates <i>p</i>, the probability of packet erasure
 
 ## Notices
