@@ -3,6 +3,7 @@ Featuring:
 * LT Codes
 * Random subset
 * Sophisticated carousel
+* Plain old carousel
 
 Fountain codes take a message of <i>k</i> symbols and can generate a virtually unlimited number of encoding symbols. Any subset of <i>n</i> encoding symbols suffices for decoding the message. Better fountain codes allow for smaller <i>n</i>'s
 
@@ -23,6 +24,12 @@ Note the color indicates </i>p</i>, the probability of packet erasure
 The sophisticated carousel fountain code is a glorified round-robin repeat. Instead of just cycling through sequantial parts of the message and sending those parts solo, this fountain code cycles through the multiplicative group (the non-zero elements) of a Galois Field. The bits that are set in the decimal form of the finite field element determine which parts get combined to make an encoding symbol. Finite fields have a neat property where any <i>k</i> consecutive encoding symbols are enough to decode the message.
 #### <i>n</i> vs <i>k</i>
 ![n vs k colored by p](https://github.com/matthew-a-thomas/cs-fountain-codes/raw/master/sophisticated%20carousel%20-%20n%20vs%20k%20(colored%20by%20p%3B%20with%20jitter).png "n vs k colored by p")
+Note the color indicates <i>p</i>, the probability of packet erasure
+
+### Plain old carousel
+The regular carousel probably isn't properly a fountain code. It just cycles through individual parts of the message, sending them one at a time solo. If the receiver misses a symbol it has to wait for the sender to cycle all the way back through the <i>k</i> message symbols.
+#### <i>n</i> vs <i>k</i>
+![n vs k colored by p](https://github.com/matthew-a-thomas/cs-fountain-codes/raw/master/carousel%20-%20n%20vs%20k%20(colored%20by%20p%3B%20with%20jitter).png).png "n vs k colored by p")
 Note the color indicates <i>p</i>, the probability of packet erasure
 
 ## Notices
