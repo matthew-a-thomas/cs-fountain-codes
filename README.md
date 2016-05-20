@@ -26,6 +26,10 @@ The sophisticated carousel fountain code is a glorified round-robin repeat. Inst
 ![n vs k colored by p](https://github.com/matthew-a-thomas/cs-fountain-codes/raw/master/sophisticated%20carousel%20-%20n%20vs%20k%20(colored%20by%20p%3B%20with%20jitter).png "n vs k colored by p")
 Note the color indicates <i>p</i>, the probability of packet erasure. Orange is <i>p=1</i>; blue is <i>p=0</i>
 
+Notice the inversion of <i>p</i>. Higher probabilities of packet erasure yield lower values of <i>n</i>. So do the lowest, but only the very lowest values of <i>p</i> so it's difficult to see. This means this fountain code performs best in either the most clean communications channel, or in the worst. Mathematically, this fountain code running through the worst channel (highest <i>p</i>) is equivalent to the random subset fountain code above.
+
+Also notice the different "modes" that this fountain code appears to take on: one mode has significantly higher variances than the other and seems to depend strongly on particular values of <i>k</i>. This is probably due to some mathematically relationship I haven't learned about yet. Likely it's related to which primitive polynomial for the Galois Field is used for each value of <i>k</i>.
+
 ### Plain old carousel
 The regular carousel probably isn't properly a fountain code. It just cycles through individual parts of the message, sending them one at a time solo. If the receiver misses a symbol it has to wait for the sender to cycle all the way back through the <i>k</i> message symbols.
 #### <i>n</i> vs <i>k</i>
