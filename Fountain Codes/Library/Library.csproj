@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7C4A301E-CDA9-4657-A2FC-E4699275706A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Library</RootNamespace>
+    <AssemblyName>Library</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Library.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DiscreteDistributions\DiscretePMF.cs" />
+    <Compile Include="FountainCodeImplementations\SophisticatedCarousel.cs" />
+    <Compile Include="GaussianElimination\GaussianEliminationGaloisField.cs" />
+    <Compile Include="GaussianElimination\IGaussianElimination.cs" />
+    <Compile Include="FountainCodeImplementations\Carousel.cs" />
+    <Compile Include="FountainCodeImplementations\IFountainCodeImplementation.cs" />
+    <Compile Include="FountainCodeImplementations\LubyTransform.cs" />
+    <Compile Include="FountainCodeImplementations\RandomSubset.cs" />
+    <Compile Include="FountainCodeImplementations\SpecialLubyTransform.cs" />
+    <Compile Include="GaussianElimination\Polynomial.cs" />
+    <Compile Include="GaussianElimination\PrecomputedPrimitivePolynomials.cs" />
+    <Compile Include="Input\ConsoleUtil.cs" />
+    <Compile Include="Numbers\Binary.cs" />
+    <Compile Include="Numbers\BinaryNumber.cs" />
+    <Compile Include="Numbers\Bytes.cs" />
+    <Compile Include="Randomness\Permutator.cs" />
+    <Compile Include="DiscreteDistributions\RobustSolitonDistribution.cs" />
+    <Compile Include="Sender.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Receiver.cs" />
+    <Compile Include="Symbol.cs" />
+    <Compile Include="Randomness\ThreadSafeRandom.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

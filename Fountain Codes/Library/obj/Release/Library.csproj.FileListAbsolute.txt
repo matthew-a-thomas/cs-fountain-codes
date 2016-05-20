@@ -1,0 +1,6 @@
+C:\Users\MAT7317\Dropbox\Personal\Master's Project\Library\Library\bin\Release\Library.dll
+C:\Users\MAT7317\Dropbox\Personal\Master's Project\Library\Library\bin\Release\Library.pdb
+C:\Users\MAT7317\Dropbox\Personal\Master's Project\Library\Library\obj\Release\Library.dll
+C:\Users\MAT7317\Dropbox\Personal\Master's Project\Library\Library\obj\Release\Library.pdb
+C:\Users\MAT7317\Dropbox\Personal\Master's Project\Library\Library\bin\Release\Library.XML
+C:\Users\MAT7317\Dropbox\Personal\Master's Project\Library\Library\obj\Release\Library.csprojResolveAssemblyReference.cache
