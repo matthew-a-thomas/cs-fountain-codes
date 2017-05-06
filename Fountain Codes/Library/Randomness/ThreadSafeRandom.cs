@@ -7,11 +7,12 @@ namespace Library.Randomness
 	/// </summary>
 	public class ThreadSafeRandom : Random
 	{
-		object lockObject = new object();
+	    private readonly object _lockObject = new object();
 
 		/// <summary>
 		/// Initializes a new instance of the System.Random class, using a time-dependent default seed value.
 		/// </summary>
+		// ReSharper disable once RedundantBaseConstructorCall
 		public ThreadSafeRandom() : base() { }
 		/// <summary>
 		/// Initializes a new instance of the System.Random class, using the specified seed value.
@@ -24,7 +25,7 @@ namespace Library.Randomness
 		/// <returns></returns>
 		public override int Next()
 		{
-			lock (this.lockObject)
+			lock (_lockObject)
 			{
 				return base.Next();
 			}
@@ -37,7 +38,7 @@ namespace Library.Randomness
 		/// <returns></returns>
 		public override int Next(int maxValue)
 		{
-			lock (this.lockObject)
+			lock (_lockObject)
 			{
 				return base.Next(maxValue);
 			}
@@ -51,7 +52,7 @@ namespace Library.Randomness
 		/// <returns></returns>
 		public override int Next(int minValue, int maxValue)
 		{
-			lock (this.lockObject)
+			lock (_lockObject)
 			{
 				return base.Next(minValue, maxValue);
 			}
@@ -63,7 +64,7 @@ namespace Library.Randomness
 		/// <param name="buffer"></param>
 		public override void NextBytes(byte[] buffer)
 		{
-			lock (this.lockObject)
+			lock (_lockObject)
 			{
 				base.NextBytes(buffer);
 			}
@@ -75,7 +76,7 @@ namespace Library.Randomness
 		/// <returns></returns>
 		public override double NextDouble()
 		{
-			lock (this.lockObject)
+			lock (_lockObject)
 			{
 				return base.NextDouble();
 			}

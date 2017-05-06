@@ -1,6 +1,5 @@
 ﻿using Library.FountainCodeImplementations;
 using System;
-using System.Collections.Generic;
 
 namespace Library
 {
@@ -9,39 +8,25 @@ namespace Library
 	/// </summary>
 	public class Sender
 	{
-		/// <summary>
-		/// Allows duplicates
-		/// </summary>
-		private class Comparer : IComparer<byte>
-		{
-			public int Compare(byte x, byte y)
-			{
-				if (x > y)
-					return -1;
-				else
-					return 1;
-			}
-		}
-
-		/// <summary>
+	    /// <summary>
 		/// The data that will be combined into encoding symbols
 		/// </summary>
-		Symbol<byte>[] data;
+		private readonly Symbol<byte>[] _data;
 
 		/// <summary>
 		/// The implementation we should use to generate coefficients
 		/// </summary>
-		IFountainCodeImplementation implementation;
+		private readonly IFountainCodeImplementation _implementation;
 
 		/// <summary>
 		/// The ID of the next encoding symbol to send
 		/// </summary>
-		long symbolID;
+		private long _symbolId;
 
 		/// <summary>
 		/// The number of bytes in each symbol
 		/// </summary>
-		long symbolSize;
+		private readonly long _symbolSize;
 
 		/// <summary>
 		/// Sets up a new sender that will combine the given data according to the coefficients that come from the given function
@@ -50,10 +35,10 @@ namespace Library
 		/// <param name="implementation">An implementation that generates a boolean array of coefficients. The set bits indicate which data symbols get XOR'd together to generate an encoding symbol</param>
 		public Sender(Symbol<byte>[] data, IFountainCodeImplementation implementation)
 		{
-			this.data = data;
-			this.implementation = implementation;
-			this.symbolID = 0;
-			this.symbolSize = Symbol<byte>.GetUniformSize(data);
+			_data = data;
+			_implementation = implementation;
+			_symbolId = 0;
+			_symbolSize = Symbol<byte>.GetUniformSize(data);
 		}
 
 		/// <summary>
@@ -64,20 +49,19 @@ namespace Library
 		public Tuple<bool[], Symbol<byte>> GenerateNext(ref int complexity)
 		{
 			// Get a set of coefficients for this symbol
-			var coefficients = this.implementation.GenerateCoefficients(this.symbolID++, ref complexity);
-			if (coefficients.Length != this.data.Length)
+			var coefficients = _implementation.GenerateCoefficients(_symbolId++, ref complexity);
+			if (coefficients.Length != _data.Length)
 				throw new Exception("The implementation that was given in the constructor of this object doesn't generate a coefficient array of the correct length");
 
 			// Now XOR together all the symbols flagged by the coefficients array
-			Symbol<byte> value = new Symbol<byte>(this.symbolSize); complexity += (int)this.symbolSize;
+			var value = new Symbol<byte>(_symbolSize); complexity += (int)_symbolSize;
 			for (var i = 0; i < coefficients.Length; i++) // O(n)
 			{
 				complexity++;
-				if (coefficients[i])
-				{
-					complexity++;
-					value ^= this.data[i];
-				}
+			    if (!coefficients[i])
+                    continue;
+			    complexity++;
+			    value ^= _data[i];
 			}
 
 			// Return the encoding symbol

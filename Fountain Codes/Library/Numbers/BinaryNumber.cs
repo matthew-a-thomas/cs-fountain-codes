@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Library.Numbers
 {
@@ -15,22 +13,24 @@ namespace Library.Numbers
 		/// <summary>
 		/// Makes the equivalent of a compacted number 0
 		/// </summary>
-		public BinaryNumber() : base() { }
+		// ReSharper disable once RedundantBaseConstructorCall
+		private BinaryNumber() : base() { }
 
 		/// <summary>
 		/// Makes a binary number based on the collection of bits given in Big Endian format
 		/// </summary>
 		/// <param name="collection"></param>
-		public BinaryNumber(IEnumerable<bool> collection)
+		private BinaryNumber(IEnumerable<bool> collection)
 			: base(collection)
 		{
-			this.Compact();
+			Compact();
 		}
 
 		/// <summary>
 		/// Builds a new (compacted) binary number from the given binary string
 		/// </summary>
 		/// <param name="binaryString"></param>
+		// ReSharper disable once UnusedMember.Global
 		public BinaryNumber(string binaryString)
 		{
 			var started = false;
@@ -38,12 +38,12 @@ namespace Library.Numbers
 			{
 				if (digit == '1')
 				{
-					this.AddLast(true);
+					AddLast(true);
 					started = true;
 				}
 				else if (started)
 				{
-					this.AddLast(false);
+					AddLast(false);
 				}
 			}
 		}
@@ -60,29 +60,44 @@ namespace Library.Numbers
 			{
 				for (byte i = 0; i < 8; i++)
 				{
-					this.AddFirst(Binary.IsBitSet(b, i)); // Since we're going backword, add bits onto the beginning each time
+					AddFirst(Binary.IsBitSet(b, i)); // Since we're going backword, add bits onto the beginning each time
 				}
 			}
-			this.Compact();
+			Compact();
 		}
 
 		/// <summary>
 		/// Removes leading falses
 		/// </summary>
-		public void Compact()
+		private void Compact()
 		{
-			while (this.First != null && !this.First.Value)
-				this.RemoveFirst();
+			while (First != null && !First.Value)
+				RemoveFirst();
 		}
 
-		/// <summary>
-		/// Returns the least significant bit
-		/// </summary>
-		/// <returns></returns>
-		public bool LeastSignificantBit()
+        public override bool Equals(object obj) => this == (BinaryNumber)obj;
+
+	    public override int GetHashCode()
+	    {
+	        var hash = 0;
+	        var i = 0;
+	        foreach (var bit in this)
+	        {
+                if (bit)
+                    hash += i;
+                ++i;
+	        }
+            return hash;
+	    }
+
+	    /// <summary>
+        /// Returns the least significant bit
+        /// </summary>
+        /// <returns></returns>
+        public bool LeastSignificantBit()
 		{
-			if (this.Last != null)
-				return this.Last.Value;
+			if (Last != null)
+				return Last.Value;
 			else
 				return false;
 		}
@@ -93,7 +108,7 @@ namespace Library.Numbers
 		/// <returns></returns>
 		public int MostSignificantBitIndex()
 		{
-			var index = this.Count;
+			var index = Count;
 			foreach (var bit in this)
 			{
 				if (bit)
@@ -108,7 +123,7 @@ namespace Library.Numbers
 		/// </summary>
 		public void RotateLeft()
 		{
-			this.AddLast(false);
+			AddLast(false);
 		}
 
 		/// <summary>
@@ -116,7 +131,7 @@ namespace Library.Numbers
 		/// </summary>
 		public void RotateRight()
 		{
-			this.RemoveLast();
+			RemoveLast();
 		}
 
 		/// <summary>
@@ -127,9 +142,9 @@ namespace Library.Numbers
 		{
 			var total = new BigInteger();
 
-			var degree = this.MostSignificantBitIndex();
+			var degree = MostSignificantBitIndex();
 			var i = 0;
-			var node = this.Last;
+			var node = Last;
 			var multipleOfTwo = new BigInteger(1);
 			while (node != null && i++ < degree)
 			{
@@ -174,10 +189,10 @@ namespace Library.Numbers
 			while (aNode != null && bNode != null)
 			{
 				// Calculate values
-				var a_i = aNode.Value;
-				var b_i = bNode.Value;
-				var bitwiseResult = bitwiseFn != null ? bitwiseFn(a_i, b_i, state) : false;
-				state = stateFn != null ? stateFn(a_i, b_i, state) : false;
+				var aI = aNode.Value;
+				var bI = bNode.Value;
+				var bitwiseResult = bitwiseFn != null ? bitwiseFn(aI, bI, state) : false;
+				state = stateFn != null ? stateFn(aI, bI, state) : false;
 
 				// Prepend the calculated value
 				result.AddFirst(bitwiseResult);
@@ -195,9 +210,9 @@ namespace Library.Numbers
 			while (aNode != null)
 			{
 				// Calculate values in the remainder case
-				var r_i = aNode.Value;
-				var remainderResult = remainderBitwiseFn != null ? remainderBitwiseFn(r_i, state) : false;
-				state = remainderStateFn != null ? remainderStateFn(r_i, state) : false;
+				var rI = aNode.Value;
+				var remainderResult = remainderBitwiseFn != null ? remainderBitwiseFn(rI, state) : false;
+				state = remainderStateFn != null ? remainderStateFn(rI, state) : false;
 
 				// Prepend the calculated value
 				result.AddFirst(remainderResult);
@@ -223,29 +238,19 @@ namespace Library.Numbers
 		/// <returns></returns>
 		public static BinaryNumber operator ^(BinaryNumber a, BinaryNumber b)
 		{
-			return BinaryNumber.Operate(
+			return Operate(
 				a,
 				b,
-				new Func<bool, bool, bool, bool>((a_i, b_i, state) => // Bitwise function
-				{
-					return a_i ^ b_i;
-				}),
-				new Func<bool, bool, bool, bool>((a_i, b_i, state) => // Calculate state in the bitwise case
-				{
-					return false;
-				}),
-				new Func<bool, bool, bool>((r_i, state) => // Remainder function
-				{
-					return r_i;
-				}),
-				new Func<bool, bool, bool>((r_i, state) => // Calculate state in the remainder case
-				{
-					return false;
-				}),
-				new Func<bool, bool>((state) => // Do something with the state
-				{
-					return false;
-				}));
+				(aI, bI, state) => // Bitwise function
+				    aI ^ bI,
+				(aI, bI, state) => // Calculate state in the bitwise case
+				    false,
+				(rI, state) => // Remainder function
+				    rI,
+				(rI, state) => // Calculate state in the remainder case
+				    false,
+				state => // Do something with the state
+				    false);
 		}
 
 		/// <summary>
@@ -256,29 +261,29 @@ namespace Library.Numbers
 		/// <returns></returns>
 		public static BinaryNumber operator &(BinaryNumber a, BinaryNumber b)
 		{
-			return BinaryNumber.Operate(
+			return Operate(
 				a,
 				b,
-				new Func<bool, bool, bool, bool>((a_i, b_i, state) => // Bitwise function
+				(aI, bI, state) => // Bitwise function
 				{
-					return a_i & b_i;
-				}),
-				new Func<bool, bool, bool, bool>((a_i, b_i, state) => // Calculate state in the bitwise case
+				    return aI & bI;
+				},
+				(aI, bI, state) => // Calculate state in the bitwise case
 				{
-					return false;
-				}),
-				new Func<bool, bool, bool>((r_i, state) => // Remainder function
+				    return false;
+				},
+				(rI, state) => // Remainder function
 				{
-					return false;
-				}),
-				new Func<bool, bool, bool>((r_i, state) => // Calculate state in the remainder case
+				    return false;
+				},
+				(rI, state) => // Calculate state in the remainder case
 				{
-					return false;
-				}),
-				new Func<bool, bool>((state) => // Do something with the state
+				    return false;
+				},
+				(state) => // Do something with the state
 				{
-					return false;
-				}));
+				    return false;
+				});
 		}
 
 		/// <summary>
@@ -289,29 +294,29 @@ namespace Library.Numbers
 		/// <returns></returns>
 		public static BinaryNumber operator |(BinaryNumber a, BinaryNumber b)
 		{
-			return BinaryNumber.Operate(
+			return Operate(
 				a,
 				b,
-				new Func<bool, bool, bool, bool>((a_i, b_i, state) => // Bitwise function
+				(aI, bI, state) => // Bitwise function
 				{
-					return a_i | b_i;
-				}),
-				new Func<bool, bool, bool, bool>((a_i, b_i, state) => // Calculate state in the bitwise case
+				    return aI | bI;
+				},
+				(aI, bI, state) => // Calculate state in the bitwise case
 				{
-					return false;
-				}),
-				new Func<bool, bool, bool>((r_i, state) => // Remainder function
+				    return false;
+				},
+				(rI, state) => // Remainder function
 				{
-					return r_i;
-				}),
-				new Func<bool, bool, bool>((r_i, state) => // Calculate state in the remainder case
+				    return rI;
+				},
+				(rI, state) => // Calculate state in the remainder case
 				{
-					return false;
-				}),
-				new Func<bool, bool>((state) => // Do something with the state
+				    return false;
+				},
+				(state) => // Do something with the state
 				{
-					return false;
-				}));
+				    return false;
+				});
 		}
 
 		/// <summary>
@@ -321,29 +326,29 @@ namespace Library.Numbers
 		/// <returns></returns>
 		public static BinaryNumber operator ~(BinaryNumber a)
 		{
-			return BinaryNumber.Operate(
+			return Operate(
 				a,
 				a,
-				new Func<bool, bool, bool, bool>((a_i, b_i, state) => // Bitwise function
+				(aI, bI, state) => // Bitwise function
 				{
-					return !a_i;
-				}),
-				new Func<bool, bool, bool, bool>((a_i, b_i, state) => // Calculate state in the bitwise case
+				    return !aI;
+				},
+				(aI, bI, state) => // Calculate state in the bitwise case
 				{
-					return false;
-				}),
-				new Func<bool, bool, bool>((r_i, state) => // Remainder function
+				    return false;
+				},
+				(rI, state) => // Remainder function
 				{
-					return false;
-				}),
-				new Func<bool, bool, bool>((r_i, state) => // Calculate state in the remainder case
+				    return false;
+				},
+				(rI, state) => // Calculate state in the remainder case
 				{
-					return false;
-				}),
-				new Func<bool, bool>((state) => // Do something with the state
+				    return false;
+				},
+				(state) => // Do something with the state
 				{
-					return false;
-				}));
+				    return false;
+				});
 		}
 
 		/// <summary>
@@ -377,11 +382,11 @@ namespace Library.Numbers
 		/// <returns></returns>
 		public static bool operator >(BinaryNumber a, BinaryNumber b)
 		{
-			var bMSBI = b.MostSignificantBitIndex();
-			var aMSBI = a.MostSignificantBitIndex();
-			if (bMSBI > aMSBI)
+			var bMsbi = b.MostSignificantBitIndex();
+			var aMsbi = a.MostSignificantBitIndex();
+			if (bMsbi > aMsbi)
 				return false; // The highest set bit in b is higher than in a
-			else if (aMSBI > bMSBI)
+			else if (aMsbi > bMsbi)
 				return true; // The highest set bit in a is higher than in b
 
 			// Both a and b have their highest bits set in the same place. Let's start from the end and work our way up to that point
@@ -389,14 +394,14 @@ namespace Library.Numbers
 			var bNode = b.Last;
 			var aWinning = false;
 			var count = 0;
-			while (aNode != null && bNode != null && count++ <= aMSBI)
+			while (aNode != null && bNode != null && count++ <= aMsbi)
 			{
-				var a_i = aNode.Value;
-				var b_i = bNode.Value;
+				var aI = aNode.Value;
+				var bI = bNode.Value;
 
-				if (a_i & !b_i)
+				if (aI & !bI)
 					aWinning = true;
-				else if (b_i & !a_i)
+				else if (bI & !aI)
 					aWinning = false;
 
 				aNode = aNode.Previous;
@@ -446,29 +451,29 @@ namespace Library.Numbers
 		/// <returns></returns>
 		public static BinaryNumber operator +(BinaryNumber a, BinaryNumber b)
 		{
-			return BinaryNumber.Operate(
+			return Operate(
 				a,
 				b,
-				new Func<bool, bool, bool, bool>((a_i, b_i, state) => // Bitwise function
+				(aI, bI, state) => // Bitwise function
 				{
-					return a_i ^ b_i ^ state;
-				}),
-				new Func<bool, bool, bool, bool>((a_i, b_i, state) => // Calculate state in the bitwise case
+				    return aI ^ bI ^ state;
+				},
+				(aI, bI, state) => // Calculate state in the bitwise case
 				{
-					return (a_i & b_i) | (state & (a_i ^ b_i));
-				}),
-				new Func<bool, bool, bool>((r_i, state) => // Remainder function
+				    return (aI & bI) | (state & (aI ^ bI));
+				},
+				(rI, state) => // Remainder function
 				{
-					return r_i ^ state;
-				}),
-				new Func<bool, bool, bool>((r_i, state) => // Calculate state in the remainder case
+				    return rI ^ state;
+				},
+				(rI, state) => // Calculate state in the remainder case
 				{
-					return r_i & state;
-				}),
-				new Func<bool, bool>((state) => // Do something with the state
+				    return rI & state;
+				},
+				(state) => // Do something with the state
 				{
-					return state;
-				}));
+				    return state;
+				});
 		}
 
 		/// <summary>
@@ -481,32 +486,32 @@ namespace Library.Numbers
 		{
 			if (b > a)
 				throw new Exception("Can only subtract a number from a number at least as large");
-			return BinaryNumber.Operate(
+			return Operate(
 				a,
 				b,
-				new Func<bool, bool, bool, bool>((a_i, b_i, state) => // Bitwise function
+				(aI, bI, state) => // Bitwise function
 				{
-					return a_i ^ b_i ^ state;
-				}),
-				new Func<bool, bool, bool, bool>((a_i, b_i, state) => // Calculate state in the bitwise case
+				    return aI ^ bI ^ state;
+				},
+				(aI, bI, state) => // Calculate state in the bitwise case
 				{
-					return (a_i & b_i & state) | (!a_i & (b_i | state));
-				}),
-				new Func<bool, bool, bool>((r_i, state) => // Remainder function
+				    return (aI & bI & state) | (!aI & (bI | state));
+				},
+				(rI, state) => // Remainder function
 				{
-					return r_i ^ state;
-				}),
-				new Func<bool, bool, bool>((r_i, state) => // Calculate state in the remainder case
+				    return rI ^ state;
+				},
+				(rI, state) => // Calculate state in the remainder case
 				{
-					return !r_i & state;
-				}),
-				new Func<bool, bool>((state) => // Do something with the state
+				    return !rI & state;
+				},
+				(state) => // Do something with the state
 				{
-					if (state)
-						throw new Exception("For some reason there's still a carry bit set at the end of the subtraction, even though a is supposed to be at least as large as b. This isn't supposed to happen, and means that the BinaryNumber class has a bug in its code somewhere");
-					else
-						return false;
-				}));
+				    if (state)
+				        throw new Exception("For some reason there's still a carry bit set at the end of the subtraction, even though a is supposed to be at least as large as b. This isn't supposed to happen, and means that the BinaryNumber class has a bug in its code somewhere");
+				    else
+				        return false;
+				});
 		}
 
 		/// <summary>
@@ -545,7 +550,7 @@ namespace Library.Numbers
 		{
 			BinaryNumber remainder;
 			BinaryNumber quotient;
-			BinaryNumber.LongDivision(dividend, divisor, out remainder, out quotient);
+			LongDivision(dividend, divisor, out remainder, out quotient);
 			return quotient;
 		}
 
@@ -559,7 +564,7 @@ namespace Library.Numbers
 		{
 			BinaryNumber remainder;
 			BinaryNumber quotient;
-			BinaryNumber.LongDivision(dividend, modulus, out remainder, out quotient);
+			LongDivision(dividend, modulus, out remainder, out quotient);
 			return remainder;
 		}
 

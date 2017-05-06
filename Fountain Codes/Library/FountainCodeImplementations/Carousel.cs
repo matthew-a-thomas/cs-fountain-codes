@@ -17,19 +17,19 @@ namespace Library.FountainCodeImplementations
 		/// <param name="numSymbols"></param>
 		public Carousel(int numSymbols)
 		{
-			this.NumSymbols = numSymbols;
+			NumSymbols = numSymbols;
 		}
 
 		/// <summary>
 		/// Returns a boolean array with the (symbolID % NumSymbols)th bit set. This corresponds to sending that original data symbol by itself
 		/// </summary>
-		/// <param name="symbolID"></param>
+		/// <param name="symbolId"></param>
 		/// <param name="complexity">The number of operations that had to be performed</param>
 		/// <returns></returns>
-		public bool[] GenerateCoefficients(long symbolID, ref int complexity)
+		public bool[] GenerateCoefficients(long symbolId, ref int complexity)
 		{
-			var coefficients = new bool[this.NumSymbols]; complexity += this.NumSymbols;
-			coefficients[symbolID % this.NumSymbols] = true; complexity++;
+			var coefficients = new bool[NumSymbols]; complexity += NumSymbols;
+			coefficients[symbolId % NumSymbols] = true; complexity++;
 			return coefficients;
 		}
 	}

@@ -10,7 +10,7 @@ namespace Library.FountainCodeImplementations
 		/// <summary>
 		/// The source of randomness to use
 		/// </summary>
-		Random random;
+		private readonly Random _random;
 
 		/// <summary>
 		/// The number of symbols that this implementation is set up to handle
@@ -24,21 +24,21 @@ namespace Library.FountainCodeImplementations
 		/// <param name="numSymbols"></param>
 		public RandomSubset(Random random, int numSymbols)
 		{
-			this.NumSymbols = numSymbols;
-			this.random = random;
+			NumSymbols = numSymbols;
+			_random = random;
 		}
 
 		/// <summary>
 		/// Returns an array of coefficients in which each element has a 50% chance of being set, except this doesn't return an array of coefficients in which none of the elements are set
 		/// </summary>
-		/// <param name="symbolID"></param>
+		/// <param name="symbolId"></param>
 		/// <param name="complexity">The number of operations that had to be performed</param>
 		/// <returns></returns>
-		public bool[] GenerateCoefficients(long symbolID, ref int complexity)
+		public bool[] GenerateCoefficients(long symbolId, ref int complexity)
 		{
 			var atLeastOneSet = false; // This will tell us whether there's at least one bit set in the coefficients array
-			var coefficients = new bool[this.NumSymbols]; // Initialize the coefficients array
-			complexity += this.NumSymbols;
+			var coefficients = new bool[NumSymbols]; // Initialize the coefficients array
+			complexity += NumSymbols;
 			while (!atLeastOneSet) // Loop until the coefficients array has at least one bit set
 			{
 				complexity++;
@@ -46,7 +46,7 @@ namespace Library.FountainCodeImplementations
 				{
 					complexity++;
 					atLeastOneSet |= // This will wind up taking the OR of all the coefficients. If any one of them is set then this will wind up being true, and the while loop will stop
-						coefficients[i] = (this.random.NextDouble() < 0.5); // There's a 50/50 chance that any bit will be set
+						coefficients[i] = (_random.NextDouble() < 0.5); // There's a 50/50 chance that any bit will be set
 				}
 			}
 

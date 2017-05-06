@@ -12,16 +12,16 @@ namespace Library.GaussianElimination
 		/// <summary>
 		/// An operation that can be performed between two bytes
 		/// </summary>
-		enum Operation
+		private enum Operation
 		{
 			Swap,
-			XOR
+			Xor
 		}
 
 		/// <summary>
 		/// Something which performs an operation from an index to another index
 		/// </summary>
-		class Step
+		private class Step
 		{
 			public Operation Operation { get; private set; }
 			public long FromIndex { get; private set; }
@@ -29,32 +29,32 @@ namespace Library.GaussianElimination
 
 			public Step(Operation operation, long fromIndex, long toIndex)
 			{
-				this.Operation = operation;
-				this.FromIndex = fromIndex;
-				this.ToIndex = toIndex;
+				Operation = operation;
+				FromIndex = fromIndex;
+				ToIndex = toIndex;
 			}
 		}
 
 		/// <summary>
 		/// The number of columns in the coefficient matrix
 		/// </summary>
-		long numColumns;
+		private readonly long _numColumns;
 
 		/// <summary>
 		/// The number of rows in the coefficient matrix
 		/// </summary>
-		long numRows;
+		private readonly long _numRows;
 
 		/// <summary>
 		/// The sequence of steps to perform to solve the system of equations
 		/// </summary>
-		LinkedList<Step> steps;
+		private readonly LinkedList<Step> _steps;
 
 		private GaussianEliminationGaloisField(long numColumns, long numRows)
 		{
-			this.numColumns = numColumns;
-			this.numRows = numRows;
-			this.steps = new LinkedList<Step>();
+			_numColumns = numColumns;
+			_numRows = numRows;
+			_steps = new LinkedList<Step>();
 		}
 
 		/// <summary>
@@ -69,8 +69,8 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		public static GaussianEliminationGaloisField<T> Create(bool[][] coefficients, ref int complexity)
 		{
-			var numRows = GaussianEliminationGaloisField<T>.NumRows(coefficients); complexity++;
-			var numColumns = GaussianEliminationGaloisField<T>.NumColumns(coefficients); complexity += 2;
+			var numRows = NumRows(coefficients); complexity++;
+			var numColumns = NumColumns(coefficients); complexity += 2;
 
 			{ // Create a copy of the coefficients, ensuring that all the coefficients have the same number of elements
 				var newCoefficients = new bool[numRows][]; complexity += (int)numRows;
@@ -102,51 +102,48 @@ namespace Library.GaussianElimination
 			{
 				complexity++;
 				// Find the pivot point
-				long i_max = 0;
-				for (long i = k; i < numRows; i++) // O(n)
+				long iMax = 0;
+				for (var i = k; i < numRows; i++) // O(n)
 				{
 					complexity++;
-					if (coefficients[i][k])
-					{
-						i_max = i;
-						break;
-					}
+				    if (!coefficients[i][k])
+                        continue;
+				    iMax = i;
+				    break;
 				}
-				if (!coefficients[i_max][k])
+				if (!coefficients[iMax][k])
 					return null;
 				// Swap rows k and i_max
-				if (i_max != k)
+				if (iMax != k)
 				{
-					solver.steps.AddLast(GaussianEliminationGaloisField<T>.SwapRows(coefficients, i_max, k));
+					solver._steps.AddLast(SwapRows(coefficients, iMax, k));
 					complexity += (int)numColumns;
 				}
 				// XOR pivot with all rows below the pivot
 				for (var i = k + 1; i < numRows; i++) // O(n)
 				{
 					complexity++;
-					if (coefficients[i][k])
-					{
-						solver.steps.AddLast(GaussianEliminationGaloisField<T>.XORRows(coefficients, k, i)); // We can just XOR since we're dealing with Galois Fields
-						complexity += (int)numColumns;
-					}
+				    if (!coefficients[i][k])
+                        continue;
+				    solver._steps.AddLast(XorRows(coefficients, k, i)); // We can just XOR since we're dealing with Galois Fields
+				    complexity += (int)numColumns;
 				}
 			}
 
 			// Put the matrix into reduced row echelon form using back substitution
-			for (long k = Math.Min(numRows, numColumns) - 1; k > 0; k--) // O(n^2)
+			for (var k = Math.Min(numRows, numColumns) - 1; k > 0; k--) // O(n^2)
 			{
 				complexity++;
 				if (!coefficients[k][k])
 					return null;
 				// See which other rows need to be XOR'd with this one
-				for (long i = k - 1; i >= 0; i--) // O(n)
+				for (var i = k - 1; i >= 0; i--) // O(n)
 				{
 					complexity++;
-					if (coefficients[i][k])
-					{
-						solver.steps.AddLast(GaussianEliminationGaloisField<T>.XORRows(coefficients, k, i));
-						complexity += (int)numColumns;
-					}
+				    if (!coefficients[i][k])
+                        continue;
+				    solver._steps.AddLast(XorRows(coefficients, k, i));
+				    complexity += (int)numColumns;
 				}
 			}
 
@@ -173,16 +170,16 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		public Symbol<T>[] Generate(Symbol<T>[] variables, ref int complexity)
 		{
-			if (variables.LongLength != this.numColumns)
-				throw new Exception("There isn't the right number of variables given. There should be the same number as there are columns in the coefficients matrix (" + this.numColumns + "), but " + variables.LongLength + " variables were given");
-			long symbolSize = Symbol<T>.GetUniformSize(variables);
-			var expanded = new Symbol<T>[this.numRows];
+			if (variables.LongLength != _numColumns)
+				throw new Exception("There isn't the right number of variables given. There should be the same number as there are columns in the coefficients matrix (" + _numColumns + "), but " + variables.LongLength + " variables were given");
+			var symbolSize = Symbol<T>.GetUniformSize(variables);
+			var expanded = new Symbol<T>[_numRows];
 			variables.CopyTo(expanded, 0);
-			for (long i = variables.LongLength; i < expanded.LongLength; i++)
+			for (var i = variables.LongLength; i < expanded.LongLength; i++)
 			{
 				expanded[i] = new Symbol<T>(symbolSize);
 			}
-			return GaussianEliminationGaloisField<T>.SolveInner(this.steps.Reverse(), expanded, ref complexity);
+			return SolveInner(_steps.Reverse(), expanded, ref complexity);
 		}
 
 		/// <summary>
@@ -190,7 +187,7 @@ namespace Library.GaussianElimination
 		/// </summary>
 		/// <param name="array"></param>
 		/// <returns></returns>
-		static long NumColumns(bool[][] array)
+		private static long NumColumns(bool[][] array)
 		{
 			return array[0].LongLength;
 		}
@@ -200,7 +197,7 @@ namespace Library.GaussianElimination
 		/// </summary>
 		/// <param name="array"></param>
 		/// <returns></returns>
-		static long NumRows(bool[][] array)
+		private static long NumRows(bool[][] array)
 		{
 			return array.LongLength;
 		}
@@ -213,11 +210,11 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		public Symbol<T>[] Solve(Symbol<T>[] solutions, ref int complexity)
 		{
-			if (solutions.LongLength != this.numRows)
-				throw new Exception("There isn't the right number of solutions. There should be as many solutions as there are rows in the coefficients matrix (" + this.numRows + "), but there are " + solutions.LongLength + " solutions given");
+			if (solutions.LongLength != _numRows)
+				throw new Exception("There isn't the right number of solutions. There should be as many solutions as there are rows in the coefficients matrix (" + _numRows + "), but there are " + solutions.LongLength + " solutions given");
 			Symbol<T>.GetUniformSize(solutions); complexity += solutions.Length;
-			var solved = GaussianEliminationGaloisField<T>.SolveInner(this.steps, solutions, ref complexity);
-			var trimmed = new Symbol<T>[this.numColumns]; complexity += (int)this.numColumns;
+			var solved = SolveInner(_steps, solutions, ref complexity);
+			var trimmed = new Symbol<T>[_numColumns]; complexity += (int)_numColumns;
 			for (long i = 0; i < trimmed.LongLength; i++)
 			{
 				complexity++;
@@ -235,7 +232,7 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		private static Symbol<T>[] SolveInner(IEnumerable<Step> steps, Symbol<T>[] input, ref int complexity)
 		{
-			input = input.Clone() as Symbol<T>[]; complexity += input.Length;
+			input = input.Clone() as Symbol<T>[]; complexity += input?.Length ?? throw new ArgumentNullException(nameof(input));
 			foreach (var step in steps)
 			{
 				complexity++;
@@ -247,7 +244,7 @@ namespace Library.GaussianElimination
 						input[step.FromIndex] = input[step.ToIndex];
 						input[step.ToIndex] = first;
 						break;
-					case Operation.XOR:
+					case Operation.Xor:
 						// XOR one with another
 						input[step.ToIndex] ^= input[step.FromIndex];
 						break;
@@ -265,11 +262,11 @@ namespace Library.GaussianElimination
 		/// <param name="fromRow"></param>
 		/// <param name="toRow"></param>
 		/// <returns></returns>
-		static Step SwapRows(bool[][] equations, long fromRow, long toRow)
+		private static Step SwapRows(bool[][] equations, long fromRow, long toRow)
 		{
 			if (fromRow != toRow)
 			{
-				for (var column = GaussianEliminationGaloisField<T>.NumColumns(equations) - 1; column >= 0; column--)
+				for (var column = NumColumns(equations) - 1; column >= 0; column--)
 				{
 					var from = equations[fromRow][column];
 					var to = equations[toRow][column];
@@ -291,15 +288,15 @@ namespace Library.GaussianElimination
 		/// <param name="fromRow"></param>
 		/// <param name="toRow"></param>
 		/// <returns></returns>
-		static Step XORRows(bool[][] equations, long fromRow, long toRow)
+		private static Step XorRows(bool[][] equations, long fromRow, long toRow)
 		{
 			if (fromRow != toRow)
 			{
-				for (var column = GaussianEliminationGaloisField<T>.NumColumns(equations) - 1; column >= 0; column--)
+				for (var column = NumColumns(equations) - 1; column >= 0; column--)
 				{
 					equations[toRow][column] ^= equations[fromRow][column];
 				}
-				return new Step(Operation.XOR, fromRow, toRow);
+				return new Step(Operation.Xor, fromRow, toRow);
 			}
 			else
 			{

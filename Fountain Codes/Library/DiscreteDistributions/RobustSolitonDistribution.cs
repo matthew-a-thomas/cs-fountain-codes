@@ -15,26 +15,26 @@ namespace Library.DiscreteDistributions
 		/// <param name="delta">The probability of a random walk deviating from its mean by more than a certain amount</param>
 		/// <returns></returns>
 		/// <remarks>This is a very straightforward implementation based on Michael Luby's "LT Codes" paper given in the Proceedings of the 43 rd Annual IEEE Symposium on Foundations of Computer Science</remarks>
-		public static double[] GenerateCDF(int k, int r, double delta)
+		public static double[] GenerateCdf(int k, int r, double delta)
 		{
 			if (r < 1)
 				throw new Exception("Apparently the parameter R must be greater than 1");
 
 			// rho starts us with the Ideal Soliton Distribution
 			var rho = new double[k + 1];
-			rho[1] = (double)1 / (double)k;
+			rho[1] = 1 / (double)k;
 			for (var i = 2; i <= k; i++)
 			{
-				rho[i] = (double)1 / ((double)i * (double)(i - 1));
+				rho[i] = 1 / (i * (double)(i - 1));
 			}
 
 			// tau is the correction to that Ideal Soliton Distribution
 			var tau = new double[k + 1];
 			for (var i = 1; i < k / r; i++)
 			{
-				tau[i] = (double)r / ((double)i * (double)k);
+				tau[i] = r / (i * (double)k);
 			}
-			tau[k / r] = (double)r * Math.Log((double)r / delta) / (double)k;
+			tau[k / r] = r * Math.Log(r / delta) / k;
 
 			// beta is the sum of everything
 			var beta = 0.0;

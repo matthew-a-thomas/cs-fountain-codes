@@ -13,95 +13,66 @@ namespace Library.GaussianElimination
 		/// <summary>
 		/// Represents the polynomial 1
 		/// </summary>
-		public static readonly Polynomial One = new Polynomial(new bool[] { true });
+		public static readonly Polynomial One = new Polynomial(new[] { true });
 
 		/// <summary>
 		/// Represents the polynomial X
 		/// </summary>
-		public static readonly Polynomial X = new Polynomial(new bool[] { false, true });
+		public static readonly Polynomial X = new Polynomial(new[] { false, true });
 
 		/// <summary>
 		/// This polynomial's coefficients in Little-Endian order (e.g. 1 + x + x^2 + ...)
 		/// </summary>
-		bool[] coefficients;
+		private readonly bool[] _coefficients;
 
 		/// <summary>
 		/// Gets this polynomial's degree (the highest power of x e.g. deg(1 + x) = 1)
 		/// </summary>
-		public int Degree
-		{
-			get
-			{
-				return this.coefficients.Length - 1;
-			}
-		}
+		public int Degree => _coefficients.Length - 1;
 
-		/// <summary>
+	    /// <summary>
 		/// Gets a copy of this polynomial's coefficients. Keep in mind that they're in Little-Endian order (e.g. 1 + x + x^2)
 		/// </summary>
-		public bool[] Coefficients
-		{
-			get
-			{
-				return this.coefficients.Clone() as bool[];
-			}
-		}
+		public bool[] Coefficients => _coefficients.Clone() as bool[];
 
-		/// <summary>
+	    /// <summary>
 		/// Indicates whether this polynomial is 1
 		/// </summary>
-		public bool IsOne
-		{
-			get
-			{
-				return this.Degree == 0;
-			}
-		}
+		public bool IsOne => Degree == 0;
 
-		/// <summary>
+	    /// <summary>
 		/// Indicates whether this polynomial is zero
 		/// </summary>
-		public bool IsZero
-		{
-			get
-			{
-				return this.Degree == -1;
-			}
-		}
+		public bool IsZero => Degree == -1;
 
-		/// <summary>
+	    /// <summary>
 		/// Same as calling GetNumber()
 		/// </summary>
-		public BigInteger Number
-		{
-			get
-			{
-				return this.GetNumber();
-			}
-		}
+		public BigInteger Number => GetNumber();
 
-		/// <summary>
+	    /// <summary>
 		/// Creates a new polynomial object from the given coefficients. If the given coefficients can be trimmed down then a copy is made and then trimmed down. Otherwise the given array is used without copying
 		/// </summary>
 		/// <param name="coefficients">The coefficients from smallest degree to largest</param>
 		public Polynomial(bool[] coefficients)
 		{
 			// Find the maximum degree (power of x) that the given coefficients represent
-			int maxDegree = 0;
+			int maxDegree;
+		    // ReSharper disable once EmptyEmbeddedStatement
 			for (maxDegree = coefficients.Length - 1; maxDegree >= 0 && !coefficients[maxDegree]; maxDegree--) ;
 
 			// Now make a trimmed-down copy of the given coefficients
 			if (maxDegree + 1 < coefficients.Length)
 			{
-				this.coefficients = new bool[maxDegree + 1];
-				for (var i = 0; i < this.coefficients.Length; i++)
+				_coefficients = new bool[maxDegree + 1];
+				for (var i = 0; i < _coefficients.Length; i++)
 				{
-					this.coefficients[i] = coefficients[i];
+					_coefficients[i] = coefficients[i];
 				}
 			}
 			else
 			{
-				this.coefficients = coefficients;
+				_coefficients = coefficients;
 			}
 		}
 
@@ -109,7 +80,7 @@ namespace Library.GaussianElimination
 		/// Creates a new polynomial object from the given integer
 		/// </summary>
 		/// <param name="decimalForm"></param>
-		public Polynomial(BigInteger decimalForm) : this(Polynomial.ConvertToPolynomialBits(decimalForm)) { }
+		public Polynomial(BigInteger decimalForm) : this(ConvertToPolynomialBits(decimalForm)) { }
 
 		/// <summary>
 		/// Accepts a list of bits that should be set in the coefficient. This is more convenient if you're dealing with a list like http://www.ams.org/journals/mcom/1992-59-200/S0025-5718-1992-1134730-7/S0025-5718-1992-1134730-7.pdf
@@ -159,7 +130,7 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		public Polynomial Clone()
 		{
-			return new Polynomial(this.Coefficients);
+			return new Polynomial(Coefficients);
 		}
 
 		/// <summary>
@@ -169,7 +140,7 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		public int CompareTo(Polynomial other)
 		{
-			return (this.GetNumber() - other.GetNumber()).Sign;
+			return (GetNumber() - other.GetNumber()).Sign;
 		}
 
 		/// <summary>
@@ -179,15 +150,29 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		public override bool Equals(object obj)
 		{
-			return obj is Polynomial && (obj as Polynomial) == this;
+		    var polynomial = obj as Polynomial;
+		    return polynomial != null && polynomial == this;
 		}
 
-		/// <summary>
-		/// Returns the decimal form of the given index, assuming that this polynomial is a primitive polynomial for a finite field
-		/// </summary>
-		/// <param name="indexForm"></param>
-		/// <returns></returns>
-		public BigInteger GetDecimalForm(BigInteger indexForm)
+        /// <summary>
+        /// Computes the hash code of this <see cref="Polynomial"/>
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            var hashCode = Degree;
+            for (var i = 0; i < _coefficients.Length; ++i)
+                if (_coefficients[i])
+                    hashCode += i;
+            return hashCode;
+        }
+
+        /// <summary>
+        /// Returns the decimal form of the given index, assuming that this polynomial is a primitive polynomial for a finite field
+        /// </summary>
+        /// <param name="indexForm"></param>
+        /// <returns></returns>
+        public BigInteger GetDecimalForm(BigInteger indexForm)
 		{
 			var coefficients = new bool[(long)indexForm + 1];
 			coefficients[coefficients.Length - 1] = true;
@@ -208,7 +193,7 @@ namespace Library.GaussianElimination
 
 			// This is kind of the opposite of performing modulus. Instead of subtracting increasing smaller multiples of the primitive polynomial to cancel out the higher bits until there's only a remainder left, we start with the remainder and add on increasingly larger multiples of the primitive polynomial in order to cancel out the lower bits until only a single bit is set
 			var binary = new BinaryNumber(decimalForm); // The binary version of the given decimal
-			var polynomial = new BinaryNumber(this.GetNumber()); // The binary version of this polynomial. Note that BinaryNumber's bits are set from most- to least-significant, which is the opposite of a Polynomial
+			var polynomial = new BinaryNumber(GetNumber()); // The binary version of this polynomial. Note that BinaryNumber's bits are set from most- to least-significant, which is the opposite of a Polynomial
 
 			// Define a method that will throw an exception if things don't work
 			var throwException = new Action(() =>
@@ -248,9 +233,9 @@ namespace Library.GaussianElimination
 		public BigInteger GetNumber()
 		{
 			BigInteger result = 0;
-			for (var i = 0; i < this.coefficients.Length; i++)
+			for (var i = 0; i < _coefficients.Length; i++)
 			{
-				if (this.coefficients[i])
+				if (_coefficients[i])
 					result += BigInteger.Pow(2, i);
 			}
 			return result;
@@ -262,24 +247,23 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		public override string ToString()
 		{
-			var parts = new List<string>(this.coefficients.Length);
-			for (var i = 0; i < this.coefficients.Length; i++)
+			var parts = new List<string>(_coefficients.Length);
+			for (var i = 0; i < _coefficients.Length; i++)
 			{
-				if (this.coefficients[i])
-				{
-					if (i > 1)
-					{
-						parts.Add("x^" + i);
-					}
-					else if (i == 1)
-					{
-						parts.Add("x");
-					}
-					else
-					{
-						parts.Add("1");
-					}
-				}
+			    if (!_coefficients[i])
+                    continue;
+			    if (i > 1)
+			    {
+			        parts.Add("x^" + i);
+			    }
+			    else if (i == 1)
+			    {
+			        parts.Add("x");
+			    }
+			    else
+			    {
+			        parts.Add("1");
+			    }
 			}
 			return string.Join("+", parts.ToArray());
 		}
@@ -305,7 +289,7 @@ namespace Library.GaussianElimination
 			}
 
 			var coefficients = larger.Coefficients;
-			int i = 0;
+			var i = 0;
 			foreach (var coefficient in smaller.Coefficients)
 			{
 				coefficients[i++] ^= coefficient;
@@ -322,16 +306,16 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		public static Polynomial Mod(Polynomial polynomial, Polynomial modulus)
 		{
-			polynomial = new Polynomial(polynomial.coefficients.Clone() as bool[]);
-			if (modulus.coefficients.Length == 0)
+			polynomial = new Polynomial(polynomial._coefficients.Clone() as bool[]);
+			if (modulus._coefficients.Length == 0)
 				throw new Exception("The given modulus is equivalent to the zero polynomial. Please give a non-zero polynomial");
-			while (polynomial.coefficients.Length >= modulus.coefficients.Length)
+			while (polynomial._coefficients.Length >= modulus._coefficients.Length)
 			{
-				for (var i = 0; i < modulus.coefficients.Length; i++)
+				for (var i = 0; i < modulus._coefficients.Length; i++)
 				{
-					polynomial.coefficients[i + (polynomial.coefficients.Length - modulus.coefficients.Length)] ^= modulus.coefficients[i];
+					polynomial._coefficients[i + (polynomial._coefficients.Length - modulus._coefficients.Length)] ^= modulus._coefficients[i];
 				}
-				polynomial = new Polynomial(polynomial.coefficients); // Reduces the length of the polynomial's coefficient array if necessary
+				polynomial = new Polynomial(polynomial._coefficients); // Reduces the length of the polynomial's coefficient array if necessary
 			}
 			return polynomial;
 		}
@@ -383,13 +367,13 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		public static bool operator ==(Polynomial a, Polynomial b)
 		{
-			if (object.ReferenceEquals(a, null) || object.ReferenceEquals(b, null))
+			if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
 				return false;
 			if (a.Degree != b.Degree)
 				return false;
-			for (var i = 0; i < a.coefficients.Length; i++)
+			for (var i = 0; i < a._coefficients.Length; i++)
 			{
-				if (a.coefficients[i] ^ b.coefficients[i])
+				if (a._coefficients[i] ^ b._coefficients[i])
 					return false;
 			}
 			return true;
@@ -414,7 +398,7 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		public static Polynomial operator +(Polynomial a, Polynomial b)
 		{
-			return Polynomial.Add(a, b);
+			return Add(a, b);
 		}
 
 		/// <summary>
@@ -425,7 +409,7 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		public static Polynomial operator *(Polynomial a, Polynomial b)
 		{
-			return Polynomial.Multiply(a, b);
+			return Multiply(a, b);
 		}
 
 		/// <summary>
@@ -436,7 +420,7 @@ namespace Library.GaussianElimination
 		/// <returns></returns>
 		public static Polynomial operator %(Polynomial a, Polynomial modulus)
 		{
-			return Polynomial.Mod(a, modulus);
+			return Mod(a, modulus);
 		}
 	}
 }

@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Split_CSV_files
 {
-	class Program
+    internal class Program
 	{
-		static void Main(string[] args)
+	    private static void Main()
 		{
 			Console.WriteLine(
 @"This program splits an output CSV file up into different files, applies
@@ -41,23 +38,25 @@ filters, and additionally appends some computed columns");
 					var p = double.Parse(split[parts["p"]]);
 					var test = split[parts["test"]];
 					var n = int.Parse(split[parts["n"]]);
+				    // ReSharper disable UnusedVariable
 					var generationComplexity = int.Parse(split[parts["generation-complexity"]]);
 					var solutionComplexity = int.Parse(split[parts["solution-complexity"]]);
+				    // ReSharper restore UnusedVariable
 
 					// Figure out computed columns
 					var kInv = Math.Pow(k, -1);
 					var logK = Math.Log(k);
 					long k2 = k * k;
-					long k3 = k2 * k;
+					var k3 = k2 * k;
 					var expK = Math.Exp(k);
 					var nInv = Math.Pow(n, -1);
 					var logN = Math.Log(n);
 					long n2 = n * n;
-					long n3 = n2 * n;
+					var n3 = n2 * n;
 					var expN = Math.Exp(n);
 					var logP = Math.Log(p);
 					var expP = Math.Exp(p);
-					var overheadFraction = (double)n / (double)k;
+					var overheadFraction = n / (double)k;
 					var overheadRaw = n - k;
 
 					// Make sure n isn't -1, which indicates a failure

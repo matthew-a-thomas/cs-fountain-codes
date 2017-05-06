@@ -5,32 +5,27 @@ namespace Library.DiscreteDistributions
 	/// <summary>
 	/// Implements a probability mass function based on any discrete cumulative distribution function. https://en.wikipedia.org/wiki/Probability_mass_function
 	/// </summary>
-	public class DiscretePMF
+	public class DiscretePmf
 	{
-		double[] cdf;
-		Random random;
+	    private readonly double[] _cdf;
+	    private readonly Random _random;
 
 		/// <summary>
 		/// Gets the number of elements in the CDF that was provided to the constructor
 		/// </summary>
-		public int Max
-		{
-			get
-			{
-				return cdf.Length;
-			}
-		}
+		public int Max => _cdf.Length;
 
-		/// <summary>
+	    /// <summary>
 		/// Creates a new probability mass function from the given cumulative distribution function and uniform random number generator. https://en.wikipedia.org/wiki/Probability_mass_function
 		/// </summary>
 		/// <param name="random"></param>
 		/// <param name="cdf">The values in this array must be sorted from least to greatest, and the last element must equal 1. https://en.wikipedia.org/wiki/Cumulative_distribution_function</param>
-		public DiscretePMF(Random random, double[] cdf)
+		public DiscretePmf(Random random, double[] cdf)
 		{
 			// Sanity checks
 			if (cdf == null || cdf.Length == 0)
 				throw new Exception("Please provide a cumulative distribution function that contains at least one number");
+		    // ReSharper disable once CompareOfFloatsByEqualityOperator
 			if (cdf[cdf.Length - 1] != 1.0)
 				throw new Exception("Please provide a cumulative distribution function that has the number 1 as its last element");
 			for (var i = 1; i < cdf.Length; i++)
@@ -40,8 +35,8 @@ namespace Library.DiscreteDistributions
 			}
 
 			// Store values
-			this.cdf = cdf;
-			this.random = random;
+			_cdf = cdf;
+			_random = random;
 		}
 
 		/// <summary>
@@ -50,8 +45,8 @@ namespace Library.DiscreteDistributions
 		/// <returns>An integer between 0 (inclusive) and cdf.Length (exclusive)</returns>
 		public int Generate()
 		{
-			var rand = this.random.NextDouble(); // A uniform random variable
-			var searchResult = Array.BinarySearch<double>(cdf, rand); // Search for the smallest index of the cdf that has a value at least as large as the random number we picked
+			var rand = _random.NextDouble(); // A uniform random variable
+			var searchResult = Array.BinarySearch(_cdf, rand); // Search for the smallest index of the cdf that has a value at least as large as the random number we picked
 			var index = searchResult < 0 ? ~searchResult : searchResult; // BinarySearch returns a negative number of the next largest index if no exact match is found
 
 			return index;
@@ -67,10 +62,10 @@ namespace Library.DiscreteDistributions
 		{
 			// Generate lots of numbers from this PMF
 			var numRuns = 10e5;
-			var values = new int[cdf.Length];
+			var values = new int[_cdf.Length];
 			for (var i = 0; i < numRuns; i++)
 			{
-				var index = this.Generate();
+				var index = Generate();
 				values[index]++;
 			}
 
@@ -78,7 +73,7 @@ namespace Library.DiscreteDistributions
 			var result = new string[values.Length];
 			for (var i = 0; i < values.Length; i++)
 			{
-				result[i] = new string('*', (int)Math.Ceiling((double)values[i] * (double)(width) / (double)numRuns));
+				result[i] = new string('*', (int)Math.Ceiling(values[i] * (double)(width) / numRuns));
 			}
 			return result;
 		}

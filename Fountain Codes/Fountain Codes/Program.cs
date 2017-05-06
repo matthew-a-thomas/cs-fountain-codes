@@ -8,9 +8,9 @@ using System.Text;
 
 namespace Fountain_codes
 {
-	class Program
+    internal class Program
 	{
-		static void Main(string[] args)
+	    private static void Main()
 		{
 			if (Console.WindowWidth > 80)
 				Console.WindowWidth = 80;
@@ -84,7 +84,7 @@ it is still good for comparison.
 				var data = new List<Symbol<byte>>();
 				foreach (var b in Encoding.ASCII.GetBytes(ConsoleUtil.Prompt("What message would you like to send?")))
 				{
-					data.Add(new Symbol<byte>(new byte[] { b })); // Make each original data symbol a single byte big
+					data.Add(new Symbol<byte>(new[] { b })); // Make each original data symbol a single byte big
 				}
 				var erasureProbability = double.Parse(ConsoleUtil.Prompt("Packet erasure probability? [0-1)"));
 				IFountainCodeImplementation implementation;
@@ -113,19 +113,17 @@ it is still good for comparison.
 				var sender = new Sender(data.ToArray(), implementation);
 
 				// Set up a receiver
-				var receiver = new Receiver(data.Count, 1, 0);
+				var receiver = new Receiver(data.Count, 0);
 
 				// Send packets through the simulated erasure channel
-				var count = 0; // Keeps track of how many packets had to be generated
-				var numReceived = 0;
+			    var numReceived = 0;
 				while (true)
 				{
 					// Generate a packet
-					int complexity = 0;
+					var complexity = 0;
 					var packet = sender.GenerateNext(ref complexity);
 					var coefficients = packet.Item1;
 					var symbol = packet.Item2;
-					count++;
 
 					// See if we should drop/erase it
 					if (random.NextDouble() <= erasureProbability)
@@ -148,18 +146,17 @@ it is still good for comparison.
 						var result = receiver.Solve(coefficients, symbol, ref complexity);
 
 						// See if the receiver has decoded everything yet
-						if (result != null)
-						{ // The receiver has decoded everything
-							Console.WriteLine();
-							Console.WriteLine(string.Format("Decoded everything after receiving {0} packets\n({1:.##} times as many as the message length):", numReceived, (double)numReceived / (double)data.Count));
-							foreach (var part in result)
-							{
-								ConsoleUtil.Write((char)part.Data[0], ConsoleColor.DarkGreen);
-							}
-							Console.WriteLine();
+					    if (result == null)
+                            continue; // The receiver has decoded everything
+					    Console.WriteLine();
+					    Console.WriteLine($"Decoded everything after receiving {numReceived} packets\n({(double) numReceived / (double) data.Count:.##} times as many as the message length):");
+					    foreach (var part in result)
+					    {
+					        ConsoleUtil.Write((char)part.Data[0], ConsoleColor.DarkGreen);
+					    }
+					    Console.WriteLine();
 
-							break; // Stop looping
-						}
+					    break; // Stop looping
 					}
 				}
 				Console.WriteLine();

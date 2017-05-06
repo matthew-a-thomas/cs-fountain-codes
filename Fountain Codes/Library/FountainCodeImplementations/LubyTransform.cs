@@ -17,12 +17,12 @@ namespace Library.FountainCodeImplementations
 		/// <summary>
 		/// The probability distribution to use to pick the degree of each encoding symbol
 		/// </summary>
-		DiscretePMF pmf;
+		private readonly DiscretePmf _pmf;
 
 		/// <summary>
 		/// The source of randomness to use
 		/// </summary>
-		Random random;
+		private readonly Random _random;
 
 		/// <summary>
 		/// Creates a new Luby Transform implementation with the given parameters
@@ -33,31 +33,31 @@ namespace Library.FountainCodeImplementations
 		/// <param name="delta">The probability that a random walk of length k deviates from its mean by more than ln(k/delta)*sqrt(k) is at most this number. In other words, a smaller delta makes the underlying Robust Soliton Distribution more robust, so a smaller number seems to be better</param>
 		public LubyTransform(Random random, int numSymbols, int r, double delta)
 		{
-			this.NumSymbols = numSymbols;
-			this.pmf = new DiscretePMF(random, RobustSolitonDistribution.GenerateCDF(numSymbols, r, delta));
-			this.random = random;
+			NumSymbols = numSymbols;
+			_pmf = new DiscretePmf(random, RobustSolitonDistribution.GenerateCdf(numSymbols, r, delta));
+			_random = random;
 		}
 
 		/// <summary>
 		/// Generates a random set of coefficients. The number of set coefficients is a number drawn from the Robust Soliton Distribution that was initialized in the constructor
 		/// </summary>
-		/// <param name="symbolID">For Luby Transform, the symbol ID has no bearing on the coefficients</param>
+		/// <param name="symbolId">For Luby Transform, the symbol ID has no bearing on the coefficients</param>
 		/// <param name="complexity">The number of operations that had to be performed</param>
 		/// <returns></returns>
-		public bool[] GenerateCoefficients(long symbolID, ref int complexity)
+		public bool[] GenerateCoefficients(long symbolId, ref int complexity)
 		{
 			// Set up the set of coefficients
-			var coefficients = new bool[this.NumSymbols]; complexity += this.NumSymbols;
-			var degree = this.pmf.Generate(); // This is the number of bits that will be set in the coefficients array. O(log(n))
-			complexity += (int)Math.Ceiling(Math.Log(this.NumSymbols, 2.0));
+			var coefficients = new bool[NumSymbols]; complexity += NumSymbols;
+			var degree = _pmf.Generate(); // This is the number of bits that will be set in the coefficients array. O(log(n))
+			complexity += (int)Math.Ceiling(Math.Log(NumSymbols, 2.0));
 			for (var i = 0; i < degree; i++) // O(n)
 			{
 				complexity++;
 				coefficients[i] = true;
 			}
 			// Mix up the coefficients array
-			Permutator<bool>.Permutate(coefficients, this.random); // O(n)
-			complexity += this.NumSymbols;
+			Permutator<bool>.Permutate(coefficients, _random); // O(n)
+			complexity += NumSymbols;
 
 			return coefficients;
 		}

@@ -55,7 +55,6 @@
     <Compile Include="Input\ConsoleUtil.cs" />
     <Compile Include="Numbers\Binary.cs" />
     <Compile Include="Numbers\BinaryNumber.cs" />
-    <Compile Include="Numbers\Bytes.cs" />
     <Compile Include="Randomness\Permutator.cs" />
     <Compile Include="DiscreteDistributions\RobustSolitonDistribution.cs" />
     <Compile Include="Sender.cs" />

@@ -4,7 +4,7 @@ namespace Library.GaussianElimination
 	/// <summary>
 	/// Defines something that does Gaussian Elimination to solve a system of equations
 	/// </summary>
-	interface IGaussianElimination<T> where T : struct
+	internal interface IGaussianElimination<T> where T : struct
 	{
 		/// <summary>
 		/// Performs the sequence of steps in reverse on the given input

@@ -19,12 +19,11 @@ namespace Library.Randomness
 			for (var i = items.Length - 1; i >= 1; i--)
 			{
 				var swapIndex = random.Next(i + 1); // Beware of https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#Implementation_errors
-				if (i != swapIndex)
-				{
-					var temp = items[i];
-					items[i] = items[swapIndex];
-					items[swapIndex] = temp;
-				}
+			    if (i == swapIndex)
+                    continue;
+			    var temp = items[i];
+			    items[i] = items[swapIndex];
+			    items[swapIndex] = temp;
 			}
 		}
 	}

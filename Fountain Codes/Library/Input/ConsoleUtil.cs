@@ -25,7 +25,8 @@ namespace Library.Input
 				Console.WriteLine(options[i]);
 			}
 			int choice;
-			while (!int.TryParse(ConsoleUtil.Prompt("Choose an option: [1-" + options.Length + "]"), out choice) || choice < 1 || choice > options.Length) ; // Continue prompting the user for input until they get it right
+		    // ReSharper disable once EmptyEmbeddedStatement
+			while (!int.TryParse(Prompt("Choose an option: [1-" + options.Length + "]"), out choice) || choice < 1 || choice > options.Length) ; // Continue prompting the user for input until they get it right
 			return choice - 1; // Remember that they're entering a one-based number while we want to return a zero-based number
 		}
 
@@ -49,7 +50,7 @@ namespace Library.Input
 		{
 			var builder = new StringBuilder();
 			ConsoleKeyInfo key;
-			bool loop = true;
+			var loop = true;
 			while (loop)
 			{
 				// Read a key
@@ -68,8 +69,7 @@ namespace Library.Input
 						}
 						break;
 					case ConsoleKey.Escape: // They want to cancel password input
-						loop = false;
-						Console.WriteLine('^');
+					    Console.WriteLine('^');
 						return null;
 					default: // They're typing a password character
 						builder.Append(key.KeyChar);
@@ -104,7 +104,7 @@ namespace Library.Input
 		/// <param name="color"></param>
 		public static void WriteLine(object o, ConsoleColor color)
 		{
-			ConsoleUtil.Write(o.ToString(), color);
+			Write(o.ToString(), color);
 			Console.WriteLine();
 		}
 	}

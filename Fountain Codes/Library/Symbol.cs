@@ -19,7 +19,7 @@ namespace Library
 		/// <param name="data"></param>
 		public Symbol(T[] data)
 		{
-			this.Data = data;
+			Data = data;
 		}
 
 		/// <summary>
@@ -28,10 +28,10 @@ namespace Library
 		/// <param name="numBytes"></param>
 		public Symbol(long numBytes)
 		{
-			this.Data = new T[numBytes];
+			Data = new T[numBytes];
 			for (long i = 0; i < numBytes; i++)
 			{
-				this.Data[i] = default(T);
+				Data[i] = default(T);
 			}
 		}
 
@@ -42,7 +42,7 @@ namespace Library
 		/// <returns></returns>
 		public static long GetUniformSize(params Symbol<T>[] symbols)
 		{
-			long symbolSize = symbols[0].Data.LongLength;
+			var symbolSize = symbols[0].Data.LongLength;
 			for (long i = 1; i < symbols.LongLength; i++)
 			{
 				if (symbols[i].Data.LongLength != symbolSize)

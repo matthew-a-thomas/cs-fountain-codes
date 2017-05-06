@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Vacuum
 {
-	class Program
+    internal class Program
 	{
-		static void Main(string[] args)
+	    private static void Main()
 		{
 			Console.WriteLine("This program is designed to suck up all the data results being generated in realtime by other machines");
 			var run = true;
@@ -34,6 +31,7 @@ namespace Vacuum
 										{
 											var first = true;
 											var count = 0;
+										    // ReSharper disable once AccessToModifiedClosure
 											while (run)
 											{
 												var line = reader.ReadLine();
@@ -47,10 +45,12 @@ namespace Vacuum
 												}
 												else
 												{
+												    // ReSharper disable AccessToDisposedClosure
 													lock (writer)
 													{
 														writer.WriteLine(line);
 													}
+													// ReSharper restore AccessToDisposedClosure
 													if (count++ % 1000 == 0)
 														Console.Write(".");
 												}

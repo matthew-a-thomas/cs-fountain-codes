@@ -7,19 +7,18 @@ using net.fec.openrq.decoder;
 using net.fec.openrq.parameters;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Simulator
 {
-	class Program
+    internal class Program
 	{
 		/// <summary>
 		/// The list of fountain codes that this simulator will test
 		/// </summary>
-		enum Test : byte
+		private enum Test : byte
 		{
 			/// <summary>
 			/// RaptorQ is implemented by the OpenRQ Java library (https://github.com/openrq-team/OpenRQ) that has been compiled into a .DLL using IKVMC (http://www.ikvm.net/userguide/ikvmc.html)
@@ -29,12 +28,12 @@ namespace Simulator
 			/// <summary>
 			/// LT Code is implemented in the Library project
 			/// </summary>
-			LTCode,
+			LtCode,
 
 			/// <summary>
 			/// Special LT Code is implemented in the Library project
 			/// </summary>
-			SpecialLTCode,
+			SpecialLtCode,
 
 			/// <summary>
 			/// Random Subset is implemented in the Library project
@@ -57,7 +56,8 @@ namespace Simulator
 			ReedSolomon
 		}
 
-		static void Main(string[] args)
+	    [SuppressMessage("ReSharper", "FunctionNeverReturns")]
+	    private static void Main()
 		{
 			Console.WriteLine("This program simulates the performance of a set of fountain codes. The results of the simulation are written to \"output.csv\" on your desktop.");
 			Console.WriteLine();
@@ -105,10 +105,10 @@ namespace Simulator
 
 										// Run the data through an erasure channel until it's decoded
 										var numPacketsReceived = 0;
-										for (var packetID = 0; packetID <= 16777216; packetID++) // 16777216 seems to be a magic number of the maximum number of encoding symbols that can be generated from RaptorQ
+										for (var packetId = 0; packetId <= 16777216; packetId++) // 16777216 seems to be a magic number of the maximum number of encoding symbols that can be generated from RaptorQ
 										{
 											// Generate an encoding symbol packet
-											var packet = encoderSourceBlock.encodingPacket(packetID);
+											var packet = encoderSourceBlock.encodingPacket(packetId);
 
 											// Erase it if the probability is right
 											if (random.NextDouble() <= erasureProbability)
@@ -122,12 +122,11 @@ namespace Simulator
 
 											// Otherwise, try decoding it
 											var result = decoderSourceBlock.putEncodingPacket(packet);
-											if (result == SourceBlockState.DECODED)
-											{
-												// Decoding was successful. Return the results
-												var decodedData = decoder.dataArray();
-												return new Tuple<byte[], int, int, int>(decodedData, numPacketsReceived, 0, 0);
-											}
+										    if (result != SourceBlockState.DECODED)
+                                                continue;
+										    // Decoding was successful. Return the results
+										    var decodedData = decoder.dataArray();
+										    return new Tuple<byte[], int, int, int>(decodedData, numPacketsReceived, 0, 0);
 										}
 										return new Tuple<byte[], int, int, int>(data, -1, 0, 0); // Indicate failure because not enough encoding symbols were able to be generated
 									}
@@ -151,7 +150,7 @@ namespace Simulator
 										var shards = new byte[existingSymbols.Count][];
 										for (var i = 0; i < data.Length; i++)
 										{
-											shards[i] = new byte[] { data[i] }; // A byte from the original data
+											shards[i] = new[] { data[i] }; // A byte from the original data
 										}
 										for (var i = data.Length; i < shards.Length; i++)
 										{
@@ -179,9 +178,9 @@ namespace Simulator
 									}
 								case Test.Carousel:
 								case Test.SophisticatedCarousel:
-								case Test.LTCode:
+								case Test.LtCode:
 								case Test.RandomSubset:
-								case Test.SpecialLTCode:
+								case Test.SpecialLtCode:
 									{
 										// Set up the implementation for this type of fountain code
 										IFountainCodeImplementation implementation;
@@ -193,13 +192,13 @@ namespace Simulator
 											case Test.SophisticatedCarousel:
 												implementation = new SophisticatedCarousel(data.Length);
 												break;
-											case Test.LTCode:
+											case Test.LtCode:
 												implementation = new LubyTransform(random, data.Length, expectedRippleSize, delta);
 												break;
 											case Test.RandomSubset:
 												implementation = new RandomSubset(random, data.Length);
 												break;
-											case Test.SpecialLTCode:
+											case Test.SpecialLtCode:
 												implementation = new SpecialLubyTransform(random, data.Length, expectedRippleSize);
 												break;
 											default:
@@ -210,17 +209,17 @@ namespace Simulator
 										var symbolArray = new Symbol<byte>[data.Length];
 										for (var i = 0; i < symbolArray.Length; i++)
 										{
-											symbolArray[i] = new Symbol<byte>(new byte[] { data[i] });
+											symbolArray[i] = new Symbol<byte>(new[] { data[i] });
 										}
 
 										// Set up the sender and receiver
 										var sender = new Sender(symbolArray, implementation);
-										var receiver = new Receiver(data.Length, 1, 0);
+										var receiver = new Receiver(data.Length, 0);
 
 										// Send packets through an erasure channel until the message is decoded
 										var numPacketsReceived = 0;
 										var generationComplexity = 0;
-										for (var packetID = 0; ; packetID++)
+										while (true)
 										{
 											// Generate an encoding packet
 											var packetComplexity = 0;
@@ -229,33 +228,30 @@ namespace Simulator
 											var symbol = packet.Item2;
 
 											// See if it should get erased
-											if (random.NextDouble() <= erasureProbability)
-											{ // This packet should get erasued
-												continue;
-											}
-											else
-											{ // This packet will get processed
-												numPacketsReceived++;
-												generationComplexity += packetComplexity;
-												if (numPacketsReceived > data.Length * 10 + 1000) // Even the carousel method only needs ~4-5x as many symbols for very high erasure rates, so 10x + 1000 should really be too much
-													throw new Exception("It seems that this implementation of fountain code is never going to be able to solve for the original data under these circumstances, because the number of received symbols is unreasonably high");
-											}
+										    if (random.NextDouble() <= erasureProbability)
+										        continue; // This packet should get erasued
+                                            
+                                            // This packet will get processed
+                                            numPacketsReceived++;
+										    generationComplexity += packetComplexity;
+										    if (numPacketsReceived > data.Length * 10 + 1000) // Even the carousel method only needs ~4-5x as many symbols for very high erasure rates, so 10x + 1000 should really be too much
+										        throw new Exception("It seems that this implementation of fountain code is never going to be able to solve for the original data under these circumstances, because the number of received symbols is unreasonably high");
 
-											// Process the packet since it'll get received
+										    // Process the packet since it'll get received
 											var solutionComplexity = 0;
 											var result = receiver.Solve(coefficients, symbol, ref solutionComplexity);
-											if (result != null)
-											{ // Enough symbols have been received
-												// Turn the decoded result into a byte array
-												var decodedData = new byte[data.Length];
-												for (var i = 0; i < decodedData.Length; i++)
-												{
-													decodedData[i] = result[i].Data[0];
-												}
+										    if (result == null)
+                                                continue; // Enough symbols have been received
 
-												// Return the results
-												return new Tuple<byte[], int, int, int>(decodedData, numPacketsReceived, generationComplexity, solutionComplexity);
-											}
+										    // Turn the decoded result into a byte array
+										    var decodedData = new byte[data.Length];
+										    for (var i = 0; i < decodedData.Length; i++)
+										    {
+										        decodedData[i] = result[i].Data[0];
+										    }
+
+										    // Return the results
+										    return new Tuple<byte[], int, int, int>(decodedData, numPacketsReceived, generationComplexity, solutionComplexity);
 										}
 									}
 								default:

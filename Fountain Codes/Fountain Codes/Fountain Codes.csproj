@@ -7,7 +7,7 @@
     <ProjectGuid>{9993E506-8698-4F34-BEAE-DF080EE4077C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Fountain Codes</RootNamespace>
+    <RootNamespace>Fountain_Codes</RootNamespace>
     <AssemblyName>Fountain Codes</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
