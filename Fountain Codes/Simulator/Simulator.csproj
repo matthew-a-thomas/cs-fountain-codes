@@ -179,9 +179,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\JavaReedSolomon.dll</HintPath>
     </Reference>
-    <Reference Include="Library">
-      <HintPath>..\..\Library\Library\bin\Release\Library.dll</HintPath>
-    </Reference>
     <Reference Include="openrq-3.4.2-alpha, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\openrq-3.4.2-alpha.dll</HintPath>
@@ -216,6 +213,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Library\Library.csproj">
+      <Project>{7c4a301e-cda9-4657-a2fc-e4699275706a}</Project>
+      <Name>Library</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,9 +1,6 @@
 ﻿using Library;
 using Library.FountainCodeImplementations;
-using Library.GaussianElimination;
-using Library.Indexable;
 using Library.Input;
-using Library.Numbers;
 using Library.Randomness;
 using System;
 using System.Collections.Generic;
