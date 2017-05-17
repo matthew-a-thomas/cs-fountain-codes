@@ -124,23 +124,19 @@ it is still good for comparison.
 					var packet = sender.GenerateNext(ref complexity);
 					var coefficients = packet.Item1;
 					var symbol = packet.Item2;
+					var character = GetCharacter(symbol);
 
 					// See if we should drop/erase it
 					if (random.NextDouble() <= erasureProbability)
 					{ // Erase this packet
-						ConsoleUtil.Write("_", ConsoleColor.DarkGray);
+						ConsoleUtil.Write(character, ConsoleColor.DarkRed, ConsoleColor.Black);
 					}
 					else
 					{ // Don't erase the packet
 						numReceived++;
 
 						// Print out the symbol that's being sent to the receiver
-						char character;
-						if (symbol.Data[0] < 32 || symbol.Data[0] > 127)
-							character = '?'; // It's a non-printable character
-						else
-							character = (char)symbol.Data[0];
-						ConsoleUtil.Write(character, ConsoleColor.White);
+					    ConsoleUtil.Write(character, ConsoleColor.Black, ConsoleColor.DarkGreen);
 
 						// Give this packet to the receiver
 						var result = receiver.Solve(coefficients, symbol, ref complexity);
@@ -152,7 +148,7 @@ it is still good for comparison.
 					    Console.WriteLine($"Decoded everything after receiving {numReceived} packets\n({(double) numReceived / (double) data.Count:.##} times as many as the message length):");
 					    foreach (var part in result)
 					    {
-					        ConsoleUtil.Write((char)part.Data[0], ConsoleColor.DarkGreen);
+					        ConsoleUtil.Write((char)part.Data[0], ConsoleColor.DarkGreen, ConsoleColor.Black);
 					    }
 					    Console.WriteLine();
 
@@ -162,5 +158,15 @@ it is still good for comparison.
 				Console.WriteLine();
 			}
 		}
+
+	    private static char GetCharacter(Symbol<byte> symbol)
+	    {
+	        char character;
+	        if (symbol.Data[0] < 32 || symbol.Data[0] > 127)
+	            character = '?'; // It's a non-printable character
+	        else
+	            character = (char) symbol.Data[0];
+	        return character;
+	    }
 	}
 }

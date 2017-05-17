@@ -84,27 +84,26 @@ namespace Library.Input
 			return builder.ToString();
 		}
 
-		/// <summary>
-		/// Writes something out to the console using the specified foreground color
-		/// </summary>
-		/// <param name="o"></param>
-		/// <param name="color"></param>
-		public static void Write(object o, ConsoleColor color)
+	    /// <summary>
+	    /// Writes something out to the console using the specified foreground color
+	    /// </summary>
+	    public static void Write(object o, ConsoleColor color, ConsoleColor background)
 		{
 			var startingColor = Console.ForegroundColor;
+		    var startingBackgroundColor = Console.BackgroundColor;
 			Console.ForegroundColor = color;
+            Console.BackgroundColor = background;
 			Console.Write(o.ToString());
 			Console.ForegroundColor = startingColor;
+		    Console.BackgroundColor = startingBackgroundColor;
 		}
 
 		/// <summary>
 		/// Writes something out to the console using the specified foreground color, appending a newline at the end
 		/// </summary>
-		/// <param name="o"></param>
-		/// <param name="color"></param>
-		public static void WriteLine(object o, ConsoleColor color)
+		public static void WriteLine(object o, ConsoleColor color, ConsoleColor background)
 		{
-			Write(o.ToString(), color);
+			Write(o.ToString(), color, background);
 			Console.WriteLine();
 		}
 	}
