@@ -145,7 +145,7 @@ it is still good for comparison.
 					    if (result == null)
                             continue; // The receiver has decoded everything
 					    Console.WriteLine();
-					    Console.WriteLine($"Decoded everything after receiving {numReceived} packets\n({(double) numReceived / (double) data.Count:.##} times as many as the message length):");
+					    Console.WriteLine($"Decoded everything after receiving {numReceived} packets\n({(double) numReceived / (double) data.Count:.##} times as many as the message length; {numReceived - data.Count} additional):");
 					    foreach (var part in result)
 					    {
 					        ConsoleUtil.Write((char)part.Data[0], ConsoleColor.DarkGreen, ConsoleColor.Black);
