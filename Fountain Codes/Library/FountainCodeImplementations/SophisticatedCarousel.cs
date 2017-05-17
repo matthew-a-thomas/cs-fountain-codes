@@ -31,7 +31,7 @@ namespace Library.FountainCodeImplementations
 			_primitivePolynomial = PrecomputedPrimitivePolynomials.Get(numSymbols);
 
 			// Set up the last polynomial and symbol ID so that the first symbol that gets generated (most likely with ID 0) can take the shortcut
-			_lastPolynomial = Polynomial.One; // Start out as the number one. Note this causes the first generated coefficient to encode the second symbol, skipping the first
+			_lastPolynomial = _primitivePolynomial; // Start out with the first encoding symbol by setting _lastPolynomial to the highest possible polynomial
 			_lastSymbolId = -1;
 		}
 
@@ -56,6 +56,8 @@ namespace Library.FountainCodeImplementations
 			// Take the shortcut of just multiplying by the polynomial's generator element repeatedly to cycle through the multiplicative group of this finite field
 			_lastPolynomial *= Polynomial.X; complexity++;
 			_lastPolynomial %= _primitivePolynomial; complexity += _numSymbols;
+		    if (_lastPolynomial.IsZero)
+		        _lastPolynomial = Polynomial.One;
 			_lastSymbolId = symbolId;
 
 			// Pull out the coefficients from the generated polynomial
