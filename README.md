@@ -1,11 +1,18 @@
 # cs-fountain-codes: <i>a few rateless forward error-correcting codes</i>
 Featuring:
-* LT Codes
-* Random subset
-* Sophisticated carousel
-* Plain old carousel
+* [LT Codes](#lt-code)
+* ["Special" LT Code](#special-lt-code)
+* [Random subset](#random-subset)
+* [Sophisticated carousel](#sophisticated-carousel)
+* [Plain old carousel](#plain-old-carousel)
 
-Fountain codes take a message of <i>k</i> symbols and can generate a virtually unlimited number of encoding symbols. Any subset of <i>n</i> encoding symbols suffices for decoding the message. Better fountain codes allow for smaller <i>n</i>'s
+Fountain codes turn a message of *k* symbols into encoding symbols such that any subset of *n*≥*k* encoding symbols will decode the message.
+
+This is great when you need to pass data through a lossy channel: as long as you can get *n* encoding symbols across the wire, the recipient will get the message.
+
+Better fountain codes allow for smaller *n*'s (and some get *n* very close to *k*, meaning very little overhead).
+
+The [Reed Solomon](https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction) error-correcting code, on the other hand, cannot produce additional check symbols once it has been constructed.
 
 ## Implementations
 ### LT Code
@@ -14,7 +21,7 @@ The LT Code implementation is based on Michael Luby's <u>LT Codes</u> paper (htt
 ![n vs k colored by p](https://github.com/matthew-a-thomas/cs-fountain-codes/raw/master/lt%20code%20-%20n%20vs%20k%20(colored%20by%20p).png "n vs k colored by p")
 Note the color indicates <i>p</i>, the probability of packet erasure. Orange is <i>p=1</i>; blue is <i>p=0</i>
 
-### "Special" LT code
+### "Special" LT Code
 The "special" LT code represents the limit of the LT code as the delta parameter of the Robust Soliton Distribution approaches zero. In other words, a constant portion of message parts are combined together for each encoding symbol.
 #### <i>n</i> vs <i>k</i>
 ![n vs k colored by p](https://github.com/matthew-a-thomas/cs-fountain-codes/raw/master/special%20lt%20-%20n%20vs%20k%20(colored%20by%20p).png "n vs k colored by p")
