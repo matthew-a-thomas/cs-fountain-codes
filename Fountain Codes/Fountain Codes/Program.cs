@@ -94,7 +94,7 @@ it is still good for comparison.
 						implementation = new LubyTransform(random, data.Count, int.Parse(ConsoleUtil.Prompt("Expected ripple size? [1-?]")), double.Parse(ConsoleUtil.Prompt("Delta? (0-1]")));
 						break;
 					case 1: // Special Luby Transform
-						implementation = new SpecialLubyTransform(random, data.Count, int.Parse(ConsoleUtil.Prompt("Expected ripple size? [1-?]")));
+						implementation = new SpecialLubyTransform(random, data.Count, int.Parse(ConsoleUtil.Prompt("Expected ripple size? [2-?]")));
 						break;
 					case 2: // Random subset
 						implementation = new RandomSubset(random, data.Count);
